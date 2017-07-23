@@ -5,7 +5,7 @@
       <h1> {{ msg }}</h1>
     </div>
     <group title="cell demo">
-      <cell title="Vux" value="Cool" is-link></cell>
+      <cell title="VUX" value="cool" is-link></cell>
     </group>
   </div>
 </template>
