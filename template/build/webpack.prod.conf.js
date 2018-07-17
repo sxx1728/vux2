@@ -9,10 +9,10 @@ const CopyWebpackPlugin = require('copy-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
-
-const env = {{#if_or unit e2e}}process.env.NODE_ENV === 'testing'
+const CompressionWebpackPlugin = require('compression-webpack-plugin');
+const env = process.env.NODE_ENV === 'testing'
   ? require('../config/test.env')
-  : {{/if_or}}require('../config/prod.env')
+  : require('../config/prod.env')
 
 const webpackConfig = merge(baseWebpackConfig, {
   module: {
@@ -53,9 +53,9 @@ const webpackConfig = merge(baseWebpackConfig, {
     // you can customize output by editing /index.html
     // see https://github.com/ampedandwired/html-webpack-plugin
     new HtmlWebpackPlugin({
-      filename: {{#if_or unit e2e}}process.env.NODE_ENV === 'testing'
+      filename: process.env.NODE_ENV === 'testing'
         ? 'index.html'
-        : {{/if_or}}config.build.index,
+        : config.build.index,
       template: 'index.html',
       inject: true,
       minify: {
@@ -109,7 +109,24 @@ const webpackConfig = merge(baseWebpackConfig, {
         to: config.build.assetsSubDirectory,
         ignore: ['.*']
       }
-    ])
+    ]),
+
+    //在 plugins 中添加
+    new webpack.optimize.UglifyJsPlugin({
+      comments: false,        //去掉注释
+      compress: {
+          warnings: false    //忽略警告,要不然会有一大堆的黄色字体出现……
+      }
+    }),
+    new CompressionWebpackPlugin({ //gzip 压缩
+      asset: '[path].gz[query]',
+      algorithm: 'gzip',
+      test: new RegExp(
+          '\\.(js|css)$'    //压缩 js 与 css
+      ),
+      threshold: 10240,
+      minRatio: 0.8
+    }),
   ]
 })
 
